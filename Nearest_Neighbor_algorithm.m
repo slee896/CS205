@@ -3,7 +3,7 @@ clear all;
 
 %%% define variables
 data = load('CS205_SP_2022_SMALLtestdata__7.txt');       % file load
-$data = load('CS205_SP_2022_LARGEtestdata__19.txt');       % file load
+%data = load('CS205_SP_2022_LARGEtestdata__19.txt');       % file load
 
 total = 0;                               % # of total
 success = 0;                             % # of success
