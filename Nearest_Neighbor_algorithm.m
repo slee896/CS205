@@ -27,7 +27,7 @@ for i = 1:n             % If there is no feature (My NN works if at least one fe
         end
     end
 end
-best_choices = [1, (success/(n*(n-1)))]
+best_choices = [1, (success/(n*(n-1)))];
 for m = 2:features                       % loop until test_set is full 
     accuracy = zeros(1,features);
     for i = 2:features                   % from class to the last feature
