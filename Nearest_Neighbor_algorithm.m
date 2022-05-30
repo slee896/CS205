@@ -4,20 +4,21 @@ clear all;
 %%% define variables
 data = load('CS205_SP_2022_SMALLtestdata__7.txt');       % file load
 %data = load('CS205_SP_2022_LARGEtestdata__19.txt');      % file load
-total = 0;                               % # of total
-success = 0;                             % # of success
-distances = zeros(size(data,1),1);       % distance matrix
-test_point = zeros(1);                   % test point. compare with test_set 
-test_set = [data(:,1)];                  % start with only class column
-n = size(data, 1);                       % # of instances
-features = size(data, 2);                % # of features + 1(class)
-best_choices =[];                        % store selected features and sucess rate
-compensation = [ones(features,1) zeros(features,1)]    % compensate feature number (since feature_number = column# -1)
+total = 0;                                 % # of total
+success = 0;                               % # of success
+distances = zeros(size(data,1),1);         % distance matrix
+test_point = zeros(1);                     % test point. compare with test_set
+data = [data(:,1) z_score(data(:,2:end))]; % Z-score normalized
+test_set = [data(:,1)];                    % start with only class column
+n = size(data, 1);                         % # of instances
+features = size(data, 2);                  % # of features + 1(class)
+best_choices =[];                          % |1.feature index|2.#ofsuccess|, order: selection first order
+compensation = [ones(features,1) zeros(features,1)];    % compensate feature number (since feature_number = column# -1)
 
 tic
 %%% Start Forward_selection
 for i = 1:n             % If there is no feature (My NN works if at least one feature exists)
-    test_point = test_set(i,:)
+    test_point = test_set(i,:);
     for j = 1:n
         if i~=j         % except itself
             if (test_point(1) == test_set(j,1))
@@ -53,14 +54,15 @@ for m = 2:features                       % loop until test_set is full
     %size(test_set)    
 end
 toc
-best_choices = best_choices - compensation% = best_choices - [ones(size(best_choices,1),1) zeros(size(best_choices,1),1)]
+best_choices = best_choices - compensation;% = best_choices - [ones(size(best_choices,1),1) zeros(size(best_choices,1),1)]
+best_choices' % print selected features' # ; success rate
 %%% Terminate Forward selection 
 
-%%% Start Backward_elimination
+% backward_elimination
 test_set = data;                    % start with full features
 test_copy = test_set;               % auxilary matrix for loop
-best_choices = [];                  % store selected features & success rate
-candidates = [];                    % store selected features
+best_choices = [];
+candidates = [];
 tic
 for m = 1:features                  % loop until test_set is empty
     accuracy = zeros(1, features); 
@@ -96,8 +98,7 @@ for m = 1:features                  % loop until test_set is empty
                     success = success +1 ;
                 end
             end
-        % for the last loop if there is no feature (Because my NN only works if a feature(s) exists) 
-        else
+        else                                        % for the last loop if there is no feature
             for j = 1:n
                 test_point = test_set(j,:);
                 for k = 1:n
@@ -116,11 +117,11 @@ for m = 1:features                  % loop until test_set is empty
     if (size(test_set,2)==1)                        % If there is no feature anymore, then break;
         break;
     end
-    [acc, ind] = sort(accuracy, 'descend');         % to find worst feature easily.
+    [acc, ind] = sort(accuracy, 'descend');         % to find most useless feature easily.
     best_choices = [best_choices;ind(1) acc(1)];    % Add worst accuracy feature  |1.feature index|2.accuracies|, order: selection first order
-    test_set = test_copy;                           % restore test_set for the next loop
+    test_set = test_copy;
     test_set(:,best_choices(2:end,1)')=[];   
 end
 toc
-best_choices = best_choices - compensation          % make best_choices' features correct
-%%% Terminate Backward_elimination
+best_choices = best_choices - compensation ; % make best_choices' features correct
+best_choices'   % print eliminated features' # ; success rate
