@@ -89,7 +89,7 @@ for m = 1:features                  % loop until test_set is empty
         end
         candidates = [candidates i];            
         test_set = test_copy;
-        test_set(:, candidates) = [1];               % to test without eliminated features
+%        test_set(:, candidates) = [];               % to test without eliminated features
         success = 0;
         
         if (size(test_set,2)>1)
